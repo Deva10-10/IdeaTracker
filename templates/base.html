@@ -2,28 +2,194 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Idea Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7ff 0%, #eef8ff 30%, #fffaf2 100%);
+            color: #1f2937;
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .topbar {
+            background: linear-gradient(90deg, #1f2a44 0%, #243b64 40%, #1e3a5f 100%);
+            box-shadow: 0 12px 25px rgba(31, 42, 68, 0.18);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffb86c, #ff7a18);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(255, 122, 24, 0.45);
+        }
+
+        .navbar-brand {
+            letter-spacing: 0.4px;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .nav-user {
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+        }
+
+        .action-btn {
+            border-radius: 999px;
+            padding: 0.55rem 1.2rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .page-shell {
+            padding: 2rem 0 3rem;
+        }
+
+        .content-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+            border-radius: 24px;
+        }
+
+        .soft-btn {
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .soft-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .glass-card {
+            border: 0;
+            border-radius: 20px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.95));
+            box-shadow: 0 18px 35px rgba(15, 23, 42, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 22px 42px rgba(37, 99, 235, 0.14);
+        }
+
+        .filter-bar {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 18px;
+            padding: 1rem;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
+        }
+
+        .status-badge {
+            padding: 0.45rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .favorite-btn {
+            border-radius: 12px;
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .idea-card-title {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #ecfeff, #eff6ff);
+            border: 1px solid rgba(59, 130, 246, 0.12);
+            border-radius: 12px;
+            color: #1e3a8a;
+        }
+
+        .form-card {
+            max-width: 760px;
+            border: 0;
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
+            box-shadow: 0 24px 60px rgba(59, 130, 246, 0.12);
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 1px solid #dbe5f0;
+            padding: 0.8rem 0.9rem;
+            background: #fff;
+        }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(59,130,246,0.12);
+            border-color: #8bb6ff;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #ff9d34, #ff7a18);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            padding: 0.8rem 1.3rem;
+            box-shadow: 0 12px 24px rgba(255, 122, 24, 0.25);
+        }
+
+        .primary-btn:hover {
+            color: white;
+            filter: brightness(1.02);
+        }
+
+        .secondary-btn {
+            border-radius: 12px;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-dark mb-4">
+    <nav class="navbar navbar-dark topbar">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'idea_list' %}">💡 Idea Manager</a>
+            <a class="navbar-brand" href="{% url 'idea_list' %}"><span class="brand-mark">💡</span> Idea Manager</a>
             <div>
                 {% if user.is_authenticated %}
-                    <span class="text-light me-3">Hi, {{ user.username }}</span>
+                    <span class="nav-user me-3">Hi, {{ user.username }}</span>
                     <form method="post" action="{% url 'logout' %}" class="d-inline">
                         {% csrf_token %}
-                        <button class="btn btn-sm btn-outline-light">Logout</button>
+                        <button class="btn btn-sm btn-outline-light action-btn">Logout</button>
                     </form>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light me-2">Login</a>
-                    <a href="{% url 'signup' %}" class="btn btn-sm btn-light">Signup</a>
+                    <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light action-btn me-2">Login</a>
+                    <a href="{% url 'signup' %}" class="btn btn-sm btn-light action-btn">Signup</a>
                 {% endif %}
             </div>
         </div>
     </nav>
-    <div class="container">
+    <div class="container page-shell">
         {% block content %}{% endblock %}
     </div>
 </body>

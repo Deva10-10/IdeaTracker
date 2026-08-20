@@ -1,97 +1,103 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>My Ideas</h2>
-    <a href="{% url 'idea_create' %}" class="btn btn-primary">+ New Idea</a>
-</div>
-
-<!-- Filters: status + favorites -->
-<form method="get" class="row g-2 mb-4">
-    <div class="col-auto">
-        <select name="status" class="form-select" onchange="this.form.submit()">
-            <option value="">All Status</option>
-            <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
-            <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
-            <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
-        </select>
+<div class="content-panel p-4 p-md-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <p class="text-uppercase text-primary fw-bold mb-1" style="letter-spacing: 0.12rem; font-size: 0.72rem;">Dashboard</p>
+            <h2 class="mb-0 fw-bold">My Ideas</h2>
+        </div>
+        <a href="{% url 'idea_create' %}" class="btn primary-btn soft-btn">+ New Idea</a>
     </div>
-    <div class="col-auto">
-        <input type="text" name="tag" class="form-control" placeholder="Filter by tag"
-               value="{{ request.GET.tag }}">
-    </div>
-    <div class="col-auto form-check mt-2">
-        <input type="checkbox" name="favorites" value="1" class="form-check-input" id="favCheck"
-               {% if request.GET.favorites %}checked{% endif %} onchange="this.form.submit()">
-        <label class="form-check-label" for="favCheck">Favorites only</label>
-    </div>
-    <div class="col-auto">
-        <button class="btn btn-outline-secondary">Apply</button>
-    </div>
-</form>
 
-<!-- Idea cards -->
-<div class="row">
-    {% for idea in ideas %}
-    <div class="col-md-6 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-                    <h5 class="card-title">{{ idea.title }}</h5>
-                    <!-- Favorite toggle -->
-                    <form method="post" action="{% url 'idea_toggle_favorite' idea.pk %}">
-                        {% csrf_token %}
-                        <button class="btn btn-sm {% if idea.is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %}">
-                            ★
-                        </button>
-                    </form>
-                </div>
-
-                <p class="card-text">{{ idea.description|truncatewords:20 }}</p>
-
-                <!-- Status badge -->
-                <span class="badge bg-{% if idea.status == 'completed' %}success{% elif idea.status == 'in_progress' %}info{% else %}secondary{% endif %} mb-2">
-                    {{ idea.get_status_display }}
-                </span>
-
-                <!-- Tags -->
-                <div class="mb-2">
-                    {% for tag in idea.tags.all %}
-                        <span class="badge bg-light text-dark border">{{ tag.name }}</span>
-                    {% endfor %}
-                </div>
-
-                <!-- Rating -->
-                <div class="mb-2">
-                    {% for i in "12345" %}
-                        {% if forloop.counter <= idea.rating %}⭐{% else %}☆{% endif %}
-                    {% endfor %}
-                </div>
-
-                <!-- AI Summary -->
-                {% if idea.ai_summary %}
-                    <div class="alert alert-info py-2 px-3 small mb-2">
-                        <strong>AI Summary:</strong> {{ idea.ai_summary }}
-                    </div>
-                {% endif %}
-                <form method="post" action="{% url 'idea_summarize' idea.pk %}" class="mb-2">
-                    {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-info">✨ Summarize with AI</button>
-                </form>
-
-                <!-- Actions -->
-                <div class="d-flex gap-2">
-                    <a href="{% url 'idea_edit' idea.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                    <a href="{% url 'idea_delete' idea.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
-                </div>
-
+    <form method="get" class="filter-bar row g-3 align-items-center mb-4">
+        <div class="col-md-3">
+            <label class="form-label small text-muted mb-1">Status</label>
+            <select name="status" class="form-select" onchange="this.form.submit()">
+                <option value="">All Status</option>
+                <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
+                <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label small text-muted mb-1">Tag</label>
+            <input type="text" name="tag" class="form-control" placeholder="Filter by tag"
+                   value="{{ request.GET.tag }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small text-muted mb-1">Favorites</label>
+            <div class="form-check mt-2">
+                <input type="checkbox" name="favorites" value="1" class="form-check-input" id="favCheck"
+                       {% if request.GET.favorites %}checked{% endif %} onchange="this.form.submit()">
+                <label class="form-check-label" for="favCheck">Favorites only</label>
             </div>
         </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-outline-secondary w-100 secondary-btn">Apply</button>
+        </div>
+    </form>
+
+    <div class="row g-4">
+        {% for idea in ideas %}
+        <div class="col-lg-6">
+            <div class="card glass-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                        <h5 class="idea-card-title mb-0">{{ idea.title }}</h5>
+                        <form method="post" action="{% url 'idea_toggle_favorite' idea.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn-sm {% if idea.is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %} favorite-btn" title="Favorite idea">
+                                ★
+                            </button>
+                        </form>
+                    </div>
+
+                    <p class="text-muted mb-3">{{ idea.description|truncatewords:22 }}</p>
+
+                    <div class="d-flex align-items-center justify-content-between mb-3 gap-2">
+                        <span class="status-badge bg-{% if idea.status == 'completed' %}success{% elif idea.status == 'in_progress' %}info{% else %}secondary{% endif %} text-white">
+                            {{ idea.get_status_display }}
+                        </span>
+                        <div class="text-warning fw-bold">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= idea.rating %}★{% else %}☆{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {% for tag in idea.tags.all %}
+                            <span class="badge rounded-pill bg-light text-dark border me-1 mb-1">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+
+                    {% if idea.ai_summary %}
+                        <div class="summary-box p-3 small mb-3">
+                            <strong>AI Summary:</strong> {{ idea.ai_summary }}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'idea_summarize' idea.pk %}" class="mb-3">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-info btn-sm soft-btn">✨ Summarize with AI</button>
+                    </form>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'idea_edit' idea.pk %}" class="btn btn-sm btn-primary soft-btn">Edit</a>
+                        <a href="{% url 'idea_delete' idea.pk %}" class="btn btn-sm btn-outline-danger soft-btn">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-light border text-center text-muted py-4 rounded-4">
+                No ideas yet. Click “New Idea” to add one.
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% empty %}
-        <p class="text-muted">No ideas yet. Click "New Idea" to add one.</p>
-    {% endfor %}
 </div>
 
 {% endblock %}
