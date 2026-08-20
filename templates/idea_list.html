@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>My Ideas</h2>
+    <a href="{% url 'idea_create' %}" class="btn btn-primary">+ New Idea</a>
+</div>
+
+<!-- Filters: status + favorites -->
+<form method="get" class="row g-2 mb-4">
+    <div class="col-auto">
+        <select name="status" class="form-select" onchange="this.form.submit()">
+            <option value="">All Status</option>
+            <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
+            <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+            <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <input type="text" name="tag" class="form-control" placeholder="Filter by tag"
+               value="{{ request.GET.tag }}">
+    </div>
+    <div class="col-auto form-check mt-2">
+        <input type="checkbox" name="favorites" value="1" class="form-check-input" id="favCheck"
+               {% if request.GET.favorites %}checked{% endif %} onchange="this.form.submit()">
+        <label class="form-check-label" for="favCheck">Favorites only</label>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary">Apply</button>
+    </div>
+</form>
+
+<!-- Idea cards -->
+<div class="row">
+    {% for idea in ideas %}
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">{{ idea.title }}</h5>
+                    <!-- Favorite toggle -->
+                    <form method="post" action="{% url 'idea_toggle_favorite' idea.pk %}">
+                        {% csrf_token %}
+                        <button class="btn btn-sm {% if idea.is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                            ★
+                        </button>
+                    </form>
+                </div>
+
+                <p class="card-text">{{ idea.description|truncatewords:20 }}</p>
+
+                <!-- Status badge -->
+                <span class="badge bg-{% if idea.status == 'completed' %}success{% elif idea.status == 'in_progress' %}info{% else %}secondary{% endif %} mb-2">
+                    {{ idea.get_status_display }}
+                </span>
+
+                <!-- Tags -->
+                <div class="mb-2">
+                    {% for tag in idea.tags.all %}
+                        <span class="badge bg-light text-dark border">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Rating -->
+                <div class="mb-2">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= idea.rating %}⭐{% else %}☆{% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- AI Summary -->
+                {% if idea.ai_summary %}
+                    <div class="alert alert-info py-2 px-3 small mb-2">
+                        <strong>AI Summary:</strong> {{ idea.ai_summary }}
+                    </div>
+                {% endif %}
+                <form method="post" action="{% url 'idea_summarize' idea.pk %}" class="mb-2">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-info">✨ Summarize with AI</button>
+                </form>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2">
+                    <a href="{% url 'idea_edit' idea.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <a href="{% url 'idea_delete' idea.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% empty %}
+        <p class="text-muted">No ideas yet. Click "New Idea" to add one.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

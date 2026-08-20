@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Acadexa</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f6f1e8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1f1f1f;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: #fffdfb;
+      border: 1px solid #e7dcc7;
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(65, 48, 15, 0.08);
+      padding: 30px 28px;
+    }
+    .brand {
+      text-align: center;
+      margin-bottom: 18px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .brand span {
+      display: inline-block;
+      width: 34px;
+      height: 34px;
+      line-height: 34px;
+      border-radius: 10px;
+      background: #d18a2d;
+      color: white;
+      margin-right: 8px;
+      font-weight: 700;
+    }
+    h2 {
+      text-align: center;
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    p.sub {
+      text-align: center;
+      margin: 0 0 24px;
+      color: #5b4a37;
+      font-size: 14px;
+    }
+    .msg {
+      background: #fff1f1;
+      border: 1px solid #f3c6c6;
+      color: #a13c3c;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+    form { display: flex; flex-direction: column; gap: 16px; }
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      color: #3b2d20;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #d9c8a7;
+      border-radius: 10px;
+      background: #fdfaf5;
+      font-size: 14px;
+      outline: none;
+    }
+    input:focus {
+      border-color: #d18a2d;
+      box-shadow: 0 0 0 3px rgba(209, 138, 45, 0.12);
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #4f4133;
+    }
+    .row label {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 400;
+    }
+    a {
+      color: #a1661d;
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+    button {
+      width: 100%;
+      border: none;
+      background: #d18a2d;
+      color: white;
+      padding: 13px 16px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button:hover { background: #ba771d; }
+    .bottom {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #5b4a37;
+    }
+    .home-link {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: #5e4d3f;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand"><span>A</span>Idea Tracker</div>
+    <h2>Welcome back</h2>
+    <p class="sub">Login to continue</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="msg">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <div>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required placeholder="Enter your username" />
+      </div>
+
+      <div>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="Enter your password" />
+      </div>
+
+      <div class="row">
+        <label><input type="checkbox" /> Remember me</label>
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="bottom">
+      Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
+    </div>
+    <a class="home-link" href="{% url 'home' %}">← Back to Home</a>
+  </div>
+</body>
+</html>

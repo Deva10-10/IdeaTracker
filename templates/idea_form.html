@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow-sm mx-auto" style="max-width: 700px;">
+    <div class="card-body">
+        <h2 class="mb-4">{% if idea %}Edit Idea{% else %}Create New Idea{% endif %}</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" id="title" name="title" class="form-control" value="{{ idea.title|default:'' }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" name="description" class="form-control" rows="5" required>{{ idea.description|default:'' }}</textarea>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="draft" {% if idea and idea.status == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="in_progress" {% if idea and idea.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="completed" {% if idea and idea.status == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="rating" class="form-label">Rating</label>
+                    <select id="rating" name="rating" class="form-select">
+                        {% for i in '12345' %}
+                            <option value="{{ forloop.counter }}" {% if idea and idea.rating == forloop.counter %}selected{% endif %}>{{ forloop.counter }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="tags" class="form-label">Tags</label>
+                    <input type="text" id="tags" name="tags" class="form-control" value="{% if idea %}{% for tag in idea.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}">
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save Idea</button>
+                <a href="{% url 'idea_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
